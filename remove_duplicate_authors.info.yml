@@ -1,0 +1,6 @@
+name: Remove Duplicate Authors
+description: Remove any duplicate authors.  Keep the oldest ones alive.
+package: Custom
+type: module
+version: 1.0
+core: 8.x
