@@ -50,6 +50,7 @@ class RemoveDuplicateAuthorsController
         
         $nid = 0;
         $prev_author = 0;
+        $prev_quote_id = 0;
         $prev_quote = "";
         $prev_author_name = "";
         $duplicates = array();
@@ -66,17 +67,18 @@ class RemoveDuplicateAuthorsController
                 if($quote->field_quot_value == $prev_quote && $quote->field_author_target_id == $prev_author){
                     
                     if(!$flag){
-                        echo 'Keeping: ' . $prev_quote . ' - <b>' . $prev_author_name . '</b> (' . $prev_author . ')<br />';
+                        echo 'Keeping: ' . $prev_quote . ' - <b>' . $prev_author_name . '</b> (AID: ' . $prev_author . ' QID: ' . $prev_quote_id . ')<br />';
                         $flag = true;
                     }
                     $duplicates[] = $quote->entity_id;
-                    echo 'Removing: ' . $quote->field_quot_value . ' - <b>' . $quote->field_fname_value . ' ' . $quote->field_lname_value . '</b> (' . $quote->entity_id . ')<br />';
+                    echo 'Removing: ' . $quote->field_quot_value . ' - <b>' . $quote->field_fname_value . ' ' . $quote->field_lname_value . '</b> (AID: ' . $quote->field_author_target_id . ' QID: ' . $quote->entity_id . ')<br />';
 		           // echo 'Previous one is the: ' . $prev_quote . ' (' . $prev_author . ')<br />';
 		            continue;
                 }
                 
                 // Update the previous author and quote to determine next duplicate.
                 $prev_author = $quote->field_author_target_id;
+                $prev_quote_id = $quote->entity_id;
                 $prev_quote = $quote->field_quot_value;
                 $prev_author_name = $quote->field_fname_value . ' ' . $quote->field_lname_value;
                 $flag = false;
