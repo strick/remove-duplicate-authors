@@ -70,7 +70,7 @@ class RemoveDuplicateAuthorsController
                         $flag = true;
                     }
                     $duplicates[] = $quote->entity_id;
-                    echo 'Removing: ' . $quote->field_quot_value . ' - <b>' . $quote->fname . ' ' . $quote->lname . '</b> (' . $quote->entity_id . ')<br />';
+                    echo 'Removing: ' . $quote->field_quot_value . ' - <b>' . $quote->field_fname_value . ' ' . $quote->field_lname_value . '</b> (' . $quote->entity_id . ')<br />';
 		           // echo 'Previous one is the: ' . $prev_quote . ' (' . $prev_author . ')<br />';
 		            continue;
                 }
@@ -78,7 +78,7 @@ class RemoveDuplicateAuthorsController
                 // Update the previous author and quote to determine next duplicate.
                 $prev_author = $quote->field_author_target_id;
                 $prev_quote = $quote->field_quot_value;
-                $prev_author_name = $quote->fname . ' ' . $quote->lname;
+                $prev_author_name = $quote->field_fname_value . ' ' . $quote->field_lname_value;
                 $flag = false;
            
                 
