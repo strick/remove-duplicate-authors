@@ -52,6 +52,7 @@ class RemoveDuplicateAuthorsController
                 // If this quote is the same as the last quote AND it has the same author, mark it as a duplicate.
                 if($quote->field_quot_value == $prev_quote && $quote->field_author_target_id == $prev_author){
                     $duplicates[] = $quote->entity_id;
+                    echo 'Found duplicate for: ' . $quote->field_quot_value . ' (' . $quote->entity_id . ')<br />';
                     $test_count++;
                 }
                 
