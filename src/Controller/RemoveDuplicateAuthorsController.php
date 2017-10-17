@@ -27,8 +27,8 @@ class RemoveDuplicateAuthorsController
     	$query->fields('fname', array('field_fname_value'));
     	$query->fields('lname', array('field_lname_value'));
         $query->join('node__field_quot', 'nfq', 'nfa.entity_id = nfq.entity_id');
-        $query->join('node__field_fname', 'fname', 'nfa.entity_id = fname.entity_id');
-        $query->join('node__field_lname', 'lname', 'nfa.entity_id = lname.entity_id');
+        $query->join('node__field_fname', 'fname', 'nfa.field_author_target_id = fname.entity_id');
+        $query->join('node__field_lname', 'lname', 'nfa.field_author_target_id = lname.entity_id');
         $query->orderBy('nfa.field_author_target_id');
         $query->orderBy('nfq.field_quot_value');
         $query->orderBy('nfa.entity_id');
