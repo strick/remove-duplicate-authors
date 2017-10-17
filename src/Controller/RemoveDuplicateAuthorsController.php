@@ -2,8 +2,6 @@
 namespace Drupal\remove_duplicate_authors\Controller;
 
 use Drupal\Core\DrupalKernel;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Finder\Finder;
 
 class RemoveDuplicateAuthorsController
 {
@@ -25,8 +23,12 @@ class RemoveDuplicateAuthorsController
         // Grab all quotes based by author and group them together
         $query = $db->select('node__field_author', 'nfa');
         $query->fields('nfa', array('entity_id', 'field_author_target_id'));
-	$query->fields('nfq', array('field_quot_value'));
+    	$query->fields('nfq', array('field_quot_value'));
+    	$query->fields('fname', array('field_fname_value'));
+    	$query->fields('lname', array('field_lname_value'));
         $query->join('node__field_quot', 'nfq', 'nfa.entity_id = nfq.entity_id');
+        $query->join('node__field_fname', 'fname', 'nfa.entity_id = fname.entity_id');
+        $query->join('node__field_lname', 'lname', 'nfa.entity_id = lname.entity_id');
         $query->orderBy('nfa.field_author_target_id');
         $query->orderBy('nfq.field_quot_value');
         $query->orderBy('nfa.entity_id');
@@ -49,7 +51,9 @@ class RemoveDuplicateAuthorsController
         $nid = 0;
         $prev_author = 0;
         $prev_quote = "";
+        $prev_author_name = "";
         $duplicates = array();
+        $flag = false;
        
         
         $test_count = 0;
@@ -60,15 +64,22 @@ class RemoveDuplicateAuthorsController
                 
                 // If this quote is the same as the last quote AND it has the same author, mark it as a duplicate.
                 if($quote->field_quot_value == $prev_quote && $quote->field_author_target_id == $prev_author){
+                    
+                    if(!$flag){
+                        echo 'Keeping: ' . $prev_quote . ' - <b>' . $prev_author_name . '</b> (' . $prev_author . ')<br />';
+                        $flag = true;
+                    }
                     $duplicates[] = $quote->entity_id;
-                    echo 'Found duplicate for: ' . $quote->field_quot_value . ' (' . $quote->entity_id . ')<br />';
-		    echo 'Previous one is the: ' . $prev_quote . ' (' . $prev_author . ')<br />';
-		    continue;
+                    echo 'Removing: ' . $quote->field_quot_value . ' - <b>' . $quote->fname . ' ' . $quote->lname . '</b> (' . $quote->entity_id . ')<br />';
+		           // echo 'Previous one is the: ' . $prev_quote . ' (' . $prev_author . ')<br />';
+		            continue;
                 }
                 
                 // Update the previous author and quote to determine next duplicate.
                 $prev_author = $quote->field_author_target_id;
                 $prev_quote = $quote->field_quot_value;
+                $prev_author_name = $quote->fname . ' ' . $quote->lname;
+                $flag = false;
            
                 
             }
