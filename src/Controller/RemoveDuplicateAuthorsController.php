@@ -10,7 +10,7 @@ class RemoveDuplicateAuthorsController
     public function index()
     {
         
-        removeAuthors();
+        $this->removeAuthors();
         return array(
             '#markup' => 'Just a test'
         );
