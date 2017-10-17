@@ -1,0 +1,7 @@
+remove_duplicate_authors.index:
+  path: '/remove-duplicate-authors'
+  defaults:
+    _controller: '\Drupal\remove_duplicate_authors\Controller\RemoveDuplicateAuthorsController::index'
+    _title: 'Index'
+  requirements:
+    _permission: 'access content'
