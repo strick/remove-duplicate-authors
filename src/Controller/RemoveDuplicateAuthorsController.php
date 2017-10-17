@@ -9,9 +9,13 @@ class RemoveDuplicateAuthorsController
 {
     public function index()
     {
+        
+        removeAuthors();
         return array(
             '#markup' => 'Just a test'
         );
+        
+        
     }
     
     protected function removeAuthors()
