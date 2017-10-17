@@ -9,7 +9,6 @@ class RemoveDuplicateAuthorsController
 {
     public function index()
     {
-        
         $this->removeAuthors();
         return array(
             '#markup' => 'Just a test'
@@ -25,7 +24,8 @@ class RemoveDuplicateAuthorsController
         
         // Grab all quotes based by author and group them together
         $query = $db->select('node__field_author', 'nfa');
-        $query->fields('nfa', array('nfa.entity_id', 'nfa.field_author_target_id', 'nfq.field_quot_value'));
+        $query->fields('nfa', array('entity_id', 'field_author_target_id'));
+	$query->fields('nfq', array('field_quot_value'));
         $query->join('node__field_quot', 'nfq', 'nfa.entity_id = nfq.entity_id');
         $query->orderBy('nfa.field_author_target_id');
         $query->orderBy('nfq.field_quot_value');
@@ -38,8 +38,13 @@ class RemoveDuplicateAuthorsController
             on nfa.entity_id = nfq.entity_id
             order by nfa.field_author_target_id, nfq.field_quot_value, nfa.entity_id
          */
-        
-        $quotes = $query->execute()->fetchAll();
+       
+	try{ 
+		$quotes = $query->execute()->fetchAll();
+	}
+	catch(\Exception $e){
+		var_dump($e);exit;
+}
         
         $nid = 0;
         $prev_author = 0;
@@ -49,7 +54,7 @@ class RemoveDuplicateAuthorsController
         
         $test_count = 0;
         
-        // Look at the ordered list of authors and quotes
+	// Look at the ordered list of authors and quotes
         try {
             foreach($quotes as $quote){
                 
@@ -57,7 +62,8 @@ class RemoveDuplicateAuthorsController
                 if($quote->field_quot_value == $prev_quote && $quote->field_author_target_id == $prev_author){
                     $duplicates[] = $quote->entity_id;
                     echo 'Found duplicate for: ' . $quote->field_quot_value . ' (' . $quote->entity_id . ')<br />';
-                    $test_count++;
+		    echo 'Previous one is the: ' . $prev_quote . ' (' . $prev_author . ')<br />';
+		    continue;
                 }
                 
                 // Update the previous author and quote to determine next duplicate.
@@ -65,7 +71,6 @@ class RemoveDuplicateAuthorsController
                 $prev_quote = $quote->field_quot_value;
            
                 
-                if($test_count > 100) exit;
             }
         }
         catch(\Error $e){
@@ -78,5 +83,7 @@ class RemoveDuplicateAuthorsController
         $entities = $storage_handler->loadMultiple($duplicates);
         $storage_handler->delete($entities);
         */
+
+	echo 'There are ' . count($duplicates);
     }
 }
