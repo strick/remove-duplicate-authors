@@ -55,6 +55,8 @@ class RemoveDuplicateAuthorsController
         $prev_author_name = "";
         $duplicates = array();
         $flag = false;
+        
+        $batch_count = 0;
        
         
         $test_count = 0;
@@ -71,11 +73,22 @@ class RemoveDuplicateAuthorsController
                         $flag = true;
                     }
                     $duplicates[] = $quote->entity_id;
+                    $batch_count++;
+                  
                     echo 'Removing: ' . $quote->field_quot_value . ' - <b>' . $quote->field_fname_value . ' ' . $quote->field_lname_value . '</b> (AID: ' . $quote->field_author_target_id . ' QID: ' . $quote->entity_id . ')<br />';
 		           // echo 'Previous one is the: ' . $prev_quote . ' (' . $prev_author . ')<br />';
 		            continue;
                 }
                 
+                // If the batch size has gone over 50, then purge the duplicates and continue.
+                if($batch_count > 50){
+                    
+                    $this->_purgeDuplicates($duplicates);
+                    
+                    $duplicates = array();
+                    $batch_count = 0;
+                }
+ 
                 // Update the previous author and quote to determine next duplicate.
                 $prev_author = $quote->field_author_target_id;
                 $prev_quote_id = $quote->entity_id;
@@ -83,20 +96,30 @@ class RemoveDuplicateAuthorsController
                 $prev_author_name = $quote->field_fname_value . ' ' . $quote->field_lname_value;
                 $flag = false;
            
+               
                 
             }
         }
         catch(\Error $e){
 
         }
-        // 
-        /*
-        // Delete teh duplicate quotes.
-        $storage_handler = \Drupal::entityTypeManager()->getStorage('node');
-        $entities = $storage_handler->loadMultiple($duplicates);
-        $storage_handler->delete($entities);
-        */
+
 
 	echo 'There are ' . count($duplicates);
+    }
+    
+    protected function _purgeDuplicates($duplicates)
+    {
+        try {
+            // Delete teh duplicate quotes.
+            $storage_handler = \Drupal::entityTypeManager()->getStorage('node');
+            $entities = $storage_handler->loadMultiple($duplicates);
+            $storage_handler->delete($entities);
+        }
+        catch(\Exception $e){
+            var_dump($e);
+            
+           var_dump($duplicates);
+        }
     }
 }
