@@ -104,6 +104,8 @@ class RemoveDuplicateAuthorsController
 
         }
 
+        // Purge the remaining duplicates.
+        $this->_purgeDuplicates($duplicates);
 
 	echo 'There are ' . count($duplicates);
     }
